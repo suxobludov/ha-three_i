@@ -1,0 +1,13 @@
+{
+  "domain": "three_i",
+  "name": "3i Robot Vacuum",
+  "codeowners": ["@suxobludov"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/suxobludov/ha-three_i",
+  "integration_type": "device",
+  "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/suxobludov/ha-three_i/issues",
+  "requirements": ["paho-mqtt>=2.1.0"],
+  "version": "0.1.0"
+}
