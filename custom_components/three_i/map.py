@@ -124,6 +124,7 @@ class ThreeICloudMap:
         self._auth = ""
         self._dev: dict = {}
         self._country: str | None = None
+        self.fallback_reason = ""
 
     def _login(self) -> None:
         reg = _nonce(19)
@@ -176,6 +177,20 @@ class ThreeICloudMap:
                 self._country = code
                 return url
         raise ThreeIMapError(f"нет ссылки на карту: code={(last or {}).get('code')}")
+
+    def fetch_latest(self) -> tuple[bytes, int]:
+        """Сохранённая карта (файл _2, map_type 3), если её нет — временная (_1)."""
+        self.fallback_reason = ""
+        last: Exception | None = None
+        for index in (2, 1):
+            try:
+                return self.fetch(index), index
+            except Exception as err:  # noqa: BLE001 — 404 и т.п.: пробуем следующий файл
+                last = err
+                if index == 2:
+                    self.fallback_reason = f"{type(err).__name__}: {err}"[:200]
+                    _LOGGER.warning("3i: сохранённая карта (_2) не скачалась, беру временную: %s", self.fallback_reason)
+        raise ThreeIMapError(f"карта недоступна: {last}")
 
     def fetch(self, index: int = 1) -> bytes:
         """Вернуть расшифрованный protobuf карты."""
@@ -259,6 +274,9 @@ class RobotMap:
 
     def __init__(self, raw: bytes) -> None:
         top = pb_parse(raw)
+        self.map_type = _int(top, 1)
+        ext = pb_parse(top[2][0]) if 2 in top else {}
+        self.uploaded = _int(ext, 2)  # unix-время, когда робот выгрузил карту
         if 3 not in top or 4 not in top:
             raise ThreeIMapError("в файле нет заголовка или сетки карты")
         head = pb_parse(top[3][0])
@@ -434,6 +452,8 @@ def render(robot_map: RobotMap, flip_y: bool = True) -> tuple[bytes, dict]:
         rooms.append(item)
     info = {
         "map_id": robot_map.map_id,
+        "map_type": robot_map.map_type,
+        "map_saved_at": robot_map.uploaded,
         "map_name": robot_map.name,
         "rooms": rooms,
         "floor_area_m2": robot_map.floor_area_m2,

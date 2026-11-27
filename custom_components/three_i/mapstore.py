@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable
 from datetime import timedelta
 import logging
@@ -14,7 +15,7 @@ from homeassistant.helpers.event import async_call_later, async_track_time_inter
 from homeassistant.util import dt as dt_util
 
 from .api import device_id_from_config
-from .const import MAP_REFRESH_INTERVAL, MAP_REFRESH_DELAY_AFTER_DOCK, SIGNAL_MAP_REFRESH
+from .const import DOMAIN, MAP_REFRESH_INTERVAL, MAP_REFRESH_DELAY_AFTER_DOCK, SIGNAL_MAP_REFRESH
 from .map import RobotMap, ThreeICloudMap, render
 
 _LOGGER = logging.getLogger(__name__)
@@ -56,9 +57,17 @@ class ThreeIMapStore:
             return
         self._busy = True
         try:
-            raw = await self.hass.async_add_executor_job(self._cloud.fetch)
+            # Как приложение: просим робота выгрузить сохранённую карту, ждём, забираем.
+            vacuum = self.hass.data.get(DOMAIN, {}).get(self.entry.entry_id, {}).get("vacuum")
+            if vacuum is not None:
+                await self.hass.async_add_executor_job(vacuum.request_map_upload)
+                await asyncio.sleep(5)
+            raw, index = await self.hass.async_add_executor_job(self._cloud.fetch_latest)
             robot_map = await self.hass.async_add_executor_job(RobotMap, raw)
             png, info = await self.hass.async_add_executor_job(render, robot_map)
+            info["map_file"] = index
+            if self._cloud.fallback_reason:
+                info["map_file_note"] = self._cloud.fallback_reason
             self.png, self.info, self.rooms = png, info, info.get("rooms", [])
             self.updated = dt_util.utcnow()
             self.error = None

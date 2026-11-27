@@ -194,6 +194,9 @@ class ThreeIVacuum(StateVacuumEntity):
         _LOGGER.info("3i MQTT: подключено")
         client.subscribe(topic(self._product_id, self._device_id, "thing/#"))
         threading.Thread(target=self._request_full_status, daemon=True).start()
+        if self.hass:
+            # после (пере)подключения — забрать свежую сохранённую карту
+            dispatcher_send(self.hass, SIGNAL_MAP_REFRESH.format(self._entry.entry_id))
 
     def _on_disconnect(self, client, userdata, rc) -> None:  # noqa: ANN001
         if self._stopping or rc == 0:
@@ -392,7 +395,22 @@ class ThreeIVacuum(StateVacuumEntity):
         else:
             self._invoke_service(command, params if isinstance(params, dict) else {})
 
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self.hass.data[DOMAIN][self._entry.entry_id]["vacuum"] = self
+
+    def request_map_upload(self) -> None:
+        """Попросить робота выгрузить сохранённую карту в облако (как делает приложение)."""
+        if not self._client or not self._client.is_connected():
+            return  # ещё не подключились — после подключения карта обновится сама
+        map_id = self._extra_attrs.get("current_map_id")
+        if map_id:
+            self._invoke_service("upload_by_mapid", {"map_id": map_id, "force": 1})
+        else:
+            self._invoke_service("upload_by_maptype", {"map_type": 0})
+
     async def async_will_remove_from_hass(self) -> None:
+        self.hass.data.get(DOMAIN, {}).get(self._entry.entry_id, {}).pop("vacuum", None)
         self._stopping = True
         if self._client:
             try:
