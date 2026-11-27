@@ -14,6 +14,7 @@ from homeassistant.components.vacuum import StateVacuumEntity, VacuumEntityFeatu
 from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import ThreeIAuthError, envelope, login_from_config, topic
@@ -27,6 +28,7 @@ from .const import (
     MQTT_PORT,
     POLL_INTERVAL,
     PRODUCT_ID,
+    SIGNAL_MAP_REFRESH,
     STATUS_PROPERTIES,
     STATUS_TEXT,
     TENANT_ID,
@@ -256,6 +258,10 @@ class ThreeIVacuum(StateVacuumEntity):
             if "status" in params:
                 new_state = self._map_state(params["status"], params)
                 if new_state != self._state:
+                    if (self.hass and new_state == STATE_DOCKED
+                            and self._state in (STATE_CLEANING, STATE_RETURNING, STATE_PAUSED)):
+                        # уборка закончилась — робот зальёт новую карту в облако
+                        dispatcher_send(self.hass, SIGNAL_MAP_REFRESH.format(self._entry.entry_id))
                     self._state = new_state
                     changed = True
 
