@@ -1,0 +1,15 @@
+# 27.11 06:22 — запросы get_map_list/get_room_list/get_map/upload_by_maptype из HA и ответы робота
+# Формат: время<TAB>топик (после /thing/)<TAB>JSON. Серийник, MAC, IP, SSID и userId замазаны.
+
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke/get_map_list	{"msgId": "1795746167997140", "version": "1.0.1", "tenantId": "Android_1528911334443982848_<USER_ID>", "method": "service.get_map_list", "params": {}, "gtid": "<USER_ID>-1795746167"}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke/get_room_list	{"msgId": "1795746167997563", "version": "1.0.1", "tenantId": "Android_1528911334443982848_<USER_ID>", "method": "service.get_room_list", "params": {}, "gtid": "<USER_ID>-1795746167"}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke/upload_by_maptype	{"method":"service.upload_by_maptype","msgId":"AIoT1795746168539","params":{"map_type":0},"platform":"AIoT","tenantId":"Android_1528911334443982848_<USER_ID>","version":"1.0.1"}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke/get_map	{"msgId": "1795746167997887", "version": "1.0.1", "tenantId": "Android_1528911334443982848_<USER_ID>", "method": "service.get_map", "params": {}, "gtid": "<USER_ID>-1795746167"}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke/get_map_info	{"msgId": "1795746167998071", "version": "1.0.1", "tenantId": "Android_1528911334443982848_<USER_ID>", "method": "service.get_map_info", "params": {}, "gtid": "<USER_ID>-1795746167"}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke_reply/get_map_list	{"msgId":"1795746167997140","code":0,"data":{"map_list":[{"name":"Карта1","id":1795664143,"cur":true,"backup":false}]}}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke_reply/upload_by_maptype	{"msgId":"AIoT1795746168539","code":0,"data":{"map_id":1795664143,"map_type":0,"timestamp":1795744672}}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke/upload_by_maptype	{"method":"service.upload_by_maptype","msgId":"AIoT1795746171540","params":{"map_type":0},"platform":"AIoT","tenantId":"Android_1528911334443982848_<USER_ID>","version":"1.0.1"}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke_reply/upload_by_maptype	{"msgId":"AIoT1795746171540","code":0,"data":{"map_id":1795664143,"map_type":0,"timestamp":1795744672}}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke_reply/get_map	{"msgId":"1795746167997887","code":1,"data":{"result":1}}	
+/mqtt/1829367890298044416/P10URU52XXXXXXX/thing/service_invoke_reply/get_map_info	{"msgId":"1795746167998071","code":1,"data":{"result":1}}	
+# (повторяющиеся upload_by_maptype после 4-го, cur_path после 15-го, quiet_status и get_preference без данных — вырезаны)

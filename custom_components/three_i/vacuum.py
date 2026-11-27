@@ -14,6 +14,7 @@ from homeassistant.components.vacuum import StateVacuumEntity, VacuumEntityFeatu
 from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.dispatcher import dispatcher_send
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import ThreeIAuthError, envelope, login_from_config, topic
@@ -27,6 +28,7 @@ from .const import (
     MQTT_PORT,
     POLL_INTERVAL,
     PRODUCT_ID,
+    SIGNAL_MAP_REFRESH,
     STATUS_PROPERTIES,
     STATUS_TEXT,
     TENANT_ID,
@@ -192,6 +194,9 @@ class ThreeIVacuum(StateVacuumEntity):
         _LOGGER.info("3i MQTT: подключено")
         client.subscribe(topic(self._product_id, self._device_id, "thing/#"))
         threading.Thread(target=self._request_full_status, daemon=True).start()
+        if self.hass:
+            # после (пере)подключения — забрать свежую сохранённую карту
+            dispatcher_send(self.hass, SIGNAL_MAP_REFRESH.format(self._entry.entry_id))
 
     def _on_disconnect(self, client, userdata, rc) -> None:  # noqa: ANN001
         if self._stopping or rc == 0:
@@ -256,6 +261,10 @@ class ThreeIVacuum(StateVacuumEntity):
             if "status" in params:
                 new_state = self._map_state(params["status"], params)
                 if new_state != self._state:
+                    if (self.hass and new_state == STATE_DOCKED
+                            and self._state in (STATE_CLEANING, STATE_RETURNING, STATE_PAUSED)):
+                        # уборка закончилась — робот зальёт новую карту в облако
+                        dispatcher_send(self.hass, SIGNAL_MAP_REFRESH.format(self._entry.entry_id))
                     self._state = new_state
                     changed = True
 
@@ -372,6 +381,12 @@ class ThreeIVacuum(StateVacuumEntity):
                     "set_room_clean",
                     {"ctrl_value": 1, "clean_type": clean_type, "room_ids": room_ids},
                 )
+        elif command == "set_property" and isinstance(params, dict) and params:
+            # Любое свойство робота, как его ставит приложение: wind, water, section, repeat_state...
+            self._set_property(dict(params))
+            for key, value in params.items():
+                self._extra_attrs[key] = value
+            self._schedule_state_update()
         elif command == "set_water_level" and isinstance(params, dict) and "water" in params:
             value = int(params["water"])
             self._set_property({"water": value})
@@ -380,7 +395,22 @@ class ThreeIVacuum(StateVacuumEntity):
         else:
             self._invoke_service(command, params if isinstance(params, dict) else {})
 
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self.hass.data[DOMAIN][self._entry.entry_id]["vacuum"] = self
+
+    def request_map_upload(self) -> None:
+        """Попросить робота выгрузить сохранённую карту в облако (как делает приложение)."""
+        if not self._client or not self._client.is_connected():
+            return  # ещё не подключились — после подключения карта обновится сама
+        map_id = self._extra_attrs.get("current_map_id")
+        if map_id:
+            self._invoke_service("upload_by_mapid", {"map_id": map_id, "force": 1})
+        else:
+            self._invoke_service("upload_by_maptype", {"map_type": 0})
+
     async def async_will_remove_from_hass(self) -> None:
+        self.hass.data.get(DOMAIN, {}).get(self._entry.entry_id, {}).pop("vacuum", None)
         self._stopping = True
         if self._client:
             try:

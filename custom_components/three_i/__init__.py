@@ -9,10 +9,11 @@ from homeassistant.core import HomeAssistant
 
 from .api import ThreeIAuthError, device_id_from_config
 from .const import CONF_DEVICE_ID, DOMAIN
+from .mapstore import ThreeIMapStore
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["vacuum", "sensor", "button", "select"]
+PLATFORMS = ["vacuum", "sensor", "button", "select", "image"]
 
 __all__ = ["async_setup_entry", "async_unload_entry", "device_id_for", "room_ids_for"]
 
@@ -50,10 +51,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.error("3i: запись настроек некорректна: %s", err)
         return False
 
-    hass.data[DOMAIN][entry.entry_id] = dict(entry.data)
+    store = ThreeIMapStore(hass, entry)
+    hass.data[DOMAIN][entry.entry_id] = {**entry.data, "map": store}
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    store.async_start()
+    entry.async_on_unload(store.async_stop)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
 

@@ -1,0 +1,25 @@
+{
+ "code": 0,
+ "result": [
+  {
+   "userId": "<masked>",
+   "deviceId": "<masked>",
+   "sn": "<masked>",
+   "mac": "<masked>",
+   "owner": "<masked>",
+   "nickname": "<masked>",
+   "versions": "[{\"ctrlVersion\":\"\",\"versionName\":\"P4.6.158\",\"packageType\":\"host_fw\",\"version\":158}]",
+   "status": 1,
+   "isDefault": false,
+   "onlineTime": "<masked>",
+   "offlineTime": "<masked>",
+   "photoUrl": "<masked>",
+   "productId": "1829367890298044416",
+   "productModeCode": "3irobotix.P10Ultra",
+   "bindTime": "<masked>",
+   "roomId": "<masked>",
+   "iotId": "<masked>",
+   "productName": "P10 Ultra"
+  }
+ ]
+}

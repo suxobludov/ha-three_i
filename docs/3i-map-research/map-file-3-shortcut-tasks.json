@@ -1,0 +1,388 @@
+[
+ {
+  "id": 1201,
+  "name": "深度清洁",
+  "map_id": 1795664143,
+  "cmd_type": 2,
+  "cmd_group": 1,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      1,
+      2,
+      2,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 1202,
+  "name": "AI 自动清洁",
+  "map_id": 1795664143,
+  "cmd_type": 6,
+  "cmd_group": 1,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      4,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 1203,
+  "name": "全屋扫拖",
+  "map_id": 1795664143,
+  "cmd_type": 1,
+  "cmd_group": 1,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      1,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 1204,
+  "name": "全屋单扫",
+  "map_id": 1795664143,
+  "cmd_type": 7,
+  "cmd_group": 1,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      0,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 1206,
+  "name": "先扫后拖",
+  "map_id": 1795664143,
+  "cmd_type": 9,
+  "cmd_group": 1,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      0,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   {
+    "child_task_id": 1,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      2,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 2301,
+  "name": "深度清洁",
+  "map_id": 1795664143,
+  "cmd_type": 2,
+  "cmd_group": 2,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      1,
+      2,
+      2,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 2302,
+  "name": "AI 自动清洁",
+  "map_id": 1795664143,
+  "cmd_type": 6,
+  "cmd_group": 2,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      4,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 2303,
+  "name": "全屋扫拖",
+  "map_id": 1795664143,
+  "cmd_type": 1,
+  "cmd_group": 2,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      1,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 2304,
+  "name": "全屋单扫",
+  "map_id": 1795664143,
+  "cmd_type": 7,
+  "cmd_group": 2,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      0,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": 2306,
+  "name": "先扫后拖",
+  "map_id": 1795664143,
+  "cmd_type": 9,
+  "cmd_group": 2,
+  "ai_show": 1,
+  "is_ai_task": 1,
+  "child_task": [
+   {
+    "child_task_id": 0,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      0,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   },
+   {
+    "child_task_id": 1,
+    "version": 1,
+    "section": 1,
+    "prefer_type": 0,
+    "room_preference": [
+     [
+      0,
+      "",
+      0,
+      2,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    ]
+   }
+  ]
+ }
+]
