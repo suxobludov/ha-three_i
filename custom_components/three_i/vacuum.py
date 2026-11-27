@@ -378,6 +378,12 @@ class ThreeIVacuum(StateVacuumEntity):
                     "set_room_clean",
                     {"ctrl_value": 1, "clean_type": clean_type, "room_ids": room_ids},
                 )
+        elif command == "set_property" and isinstance(params, dict) and params:
+            # Любое свойство робота, как его ставит приложение: wind, water, section, repeat_state...
+            self._set_property(dict(params))
+            for key, value in params.items():
+                self._extra_attrs[key] = value
+            self._schedule_state_update()
         elif command == "set_water_level" and isinstance(params, dict) and "water" in params:
             value = int(params["water"])
             self._set_property({"water": value})
