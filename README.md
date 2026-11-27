@@ -73,6 +73,14 @@ ID комнат специфичны для твоей карты робота, 
 по дампу MQTT-топиков карты. Если поле оставить пустым — кнопки не создаются,
 остальная функциональность работает.
 
+### Room IDs (optional)
+
+Room IDs are assigned by the robot sequentially starting from 10:
+the first room is 10, the second is 11, and so on. So if your home has
+4 rooms, try `10,11,12,13`. Numbers only shift if you have split or
+merged rooms in the 3i Home app — in that case leave the field empty
+(you'll still have all core controls, just no per-room buttons).
+
 ### Примеры `send_command`
 
 ```yaml
