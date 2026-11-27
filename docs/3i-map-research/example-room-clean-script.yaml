@@ -1,0 +1,120 @@
+alias: Пылесос — уборка комнаты
+description: 'Уборка одной комнаты с выбранными вариантами. Комната — номер в списке комнат карты (image.gostinaia_pylesos_karta → rooms, с 0). Без полей — значения из помощников «Пылесос: …» на дашборде.
+  Команды — как шлёт приложение 3i (проверено записью 27.11): режим set_preference_type (Авто: prefer_type 3 + mode 4; Сухая и влажная: 0+1; Сухая: 0+0; Влажная: 0+2), проходы (section), мощность (кроме
+  Авто и Влажной), вода (для Сухой и влажной и Влажной), затем set_room_clean.'
+icon: mdi:robot-vacuum
+mode: single
+fields:
+  index:
+    name: Номер комнаты
+    description: С 0, в порядке комнат на карте. Без поля — выбранная на дашборде.
+    selector:
+      number:
+        min: 0
+        max: 15
+        mode: box
+  rezhim:
+    name: Режим
+    selector:
+      select:
+        options:
+        - Авто
+        - Сухая и влажная
+        - Сухая
+        - Влажная
+  moshchnost:
+    name: Мощность
+    selector:
+      select:
+        options:
+        - Тихий
+        - Стандартный
+        - Мощный
+        - Максимум
+  voda:
+    name: Вода
+    selector:
+      select:
+        options:
+        - Низкий
+        - Средний
+        - Высокий
+  prokhody:
+    name: Проходы
+    selector:
+      select:
+        options:
+        - '1'
+        - '2'
+sequence:
+- variables:
+    rooms: '{{ state_attr(''image.gostinaia_pylesos_karta'', ''rooms'') or [] }}'
+    i: '{{ (index if index is defined else states(''input_number.pylesos_komnata'')) | int(-1) }}'
+    r: '{{ rezhim if rezhim is defined else states(''input_select.pylesos_rezhim'') }}'
+    m: '{{ moshchnost if moshchnost is defined else states(''input_select.pylesos_moshchnost'') }}'
+    v: '{{ voda if voda is defined else states(''input_select.pylesos_voda'') }}'
+    p: '{{ (prokhody if prokhody is defined else states(''input_select.pylesos_prokhody'')) | int(1) }}'
+    pref: '{{ {''Авто'': {''prefer_type'': 3, ''mode'': 4}, ''Сухая и влажная'': {''prefer_type'': 0, ''mode'': 1}, ''Сухая'': {''prefer_type'': 0, ''mode'': 0}, ''Влажная'': {''prefer_type'': 0, ''mode'':
+      2}}.get(r, {''prefer_type'': 3, ''mode'': 4}) }}'
+    use_fan: '{{ r in [''Сухая и влажная'', ''Сухая''] }}'
+    use_water: '{{ r in [''Сухая и влажная'', ''Влажная''] }}'
+- condition: template
+  value_template: '{{ 0 <= i < rooms | length }}'
+  alias: Комната выбрана и есть на карте
+- action: vacuum.send_command
+  target:
+    entity_id: vacuum.gostinaia_3i_p10_ultra
+  data:
+    command: set_preference_type
+    params: '{{ pref }}'
+  alias: Режим
+- delay:
+    seconds: 1
+- action: vacuum.send_command
+  target:
+    entity_id: vacuum.gostinaia_3i_p10_ultra
+  data:
+    command: set_property
+    params:
+      section: '{{ p }}'
+  alias: Проходы
+- if:
+  - condition: template
+    value_template: '{{ use_fan }}'
+  then:
+  - delay:
+      seconds: 1
+  - action: vacuum.set_fan_speed
+    target:
+      entity_id: vacuum.gostinaia_3i_p10_ultra
+    data:
+      fan_speed: '{{ m }}'
+    alias: Мощность
+  alias: Мощность — для сухой и сухой с влажной
+- if:
+  - condition: template
+    value_template: '{{ use_water }}'
+  then:
+  - delay:
+      seconds: 1
+  - action: vacuum.send_command
+    target:
+      entity_id: vacuum.gostinaia_3i_p10_ultra
+    data:
+      command: set_water_level
+      params:
+        water: '{{ {''Низкий'': 1, ''Средний'': 2, ''Высокий'': 3}[v] | default(2) }}'
+    alias: Вода
+  alias: Вода — для влажной и сухой с влажной
+- delay:
+    seconds: 1
+- action: vacuum.send_command
+  target:
+    entity_id: vacuum.gostinaia_3i_p10_ultra
+  data:
+    command: clean_rooms
+    params:
+      room_ids:
+      - '{{ rooms[i].id }}'
+  alias: Убрать комнату
+
